@@ -1,5 +1,7 @@
 package com.groundZer0.autobazar;
 
+import com.groundZer0.autobazar.data.users.User;
+import com.groundZer0.autobazar.data.users.UsersOps;
 import com.groundZer0.autobazar.networking.Thread;
 
 import java.io.*;
@@ -9,6 +11,7 @@ public class Main {
     private static int PORT = 8080;
 
     public static void main(String[] args) {
+        UsersOps.getUsersOps().users_loading();
         try(ServerSocket serverSocket = new ServerSocket(PORT)){
             while (true){
                 System.out.println("ServerSocket awaiting connections...");
