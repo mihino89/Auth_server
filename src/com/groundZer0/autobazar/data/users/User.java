@@ -36,7 +36,7 @@ public class User implements Serializable {
     private String operation_note;
 
     /* Server complete constructor - without password, only with token and keys */
-    public User(String first_name, String last_name, String phone_number, LocalDate birth, String email, String privilages, byte[] public_key, byte[] private_key, String token, String operation_note) {
+    public User(String first_name, String last_name, String phone_number, LocalDate birth, String email, String privilages, byte[] public_key, byte[] private_key, String token) {
         this.first_name = first_name;
         this.last_name = last_name;
         this.phone_number = phone_number;
@@ -46,7 +46,7 @@ public class User implements Serializable {
         this.public_key = public_key;
         this.private_key = private_key;
         this.token = token;
-        this.operation_note = operation_note;
+//        this.operation_note = operation_note;
     }
 
     /* Registration constructor */

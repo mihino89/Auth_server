@@ -36,9 +36,9 @@ public class Thread extends java.lang.Thread {
             }
             /* app user want registered */
             else if (Objects.equals(user.getOperation_note(), "registration")) {
-                registration_new_user(user);
+                User new_user = registration_new_user(user);
                 System.out.println("user registered");
-                UsersOps.getUsersOps().add_user(user);
+                UsersOps.getUsersOps().add_user(new_user);
                 System.out.println("user added to array");
 //                System.out.println("old password " + user.getPassword());
 //                user.setPassword("rere");

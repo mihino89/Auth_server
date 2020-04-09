@@ -2,23 +2,27 @@ package com.groundZer0.autobazar.data.users;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import netscape.javascript.JSObject;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.IOException;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
+import java.util.Objects;
+
 
 public class UsersOps {
 
     /* Singleton */
     private static UsersOps usersOps = new UsersOps();
     /* DB of users */
-    private final String file_name = "src/com/groundZer0/autobazar/data/db/users.txt";
+    private final String file_name = "src/com/groundZer0/autobazar/data/db/users.json";
     Path path = Paths.get(file_name);
 
     private ObservableList<User> list_of_users;
@@ -30,62 +34,61 @@ public class UsersOps {
     }
 
     public void users_loading() {
-        String line_file_reader;
-
         list_of_users = FXCollections.observableArrayList();
+        JSONParser jsonParser = new JSONParser();
 
-        try (BufferedReader bufferedReader = Files.newBufferedReader(path)) {
-            while ((line_file_reader = bufferedReader.readLine()) != null) {
-                String[] user_information = line_file_reader.split(" ");
+        try (FileReader fileReader = new FileReader(String.valueOf(path))) {
+            Object obj = jsonParser.parse(fileReader);
 
-                String name = user_information[0];
-                String last_name = user_information[1];
-                String phone_number = user_information[2];
-                String user_birth = user_information[3];
-                LocalDate localDate = LocalDate.parse(user_birth, dateTimeFormatter);
+            JSONArray users = (JSONArray) obj;
+            System.out.println(users);
 
-                /* Credentials */
-                String email = user_information[4];
-                String privilages = user_information[5];
-
-                /* Security */
-                byte[] public_key = user_information[6].getBytes();
-                byte[] private_key = user_information[7].getBytes();
-                String token = user_information[8];
-
-                /* Operationals */
-                String operation_note = user_information[9];
-                User user = new User(name, last_name, phone_number, localDate, email, privilages, public_key, private_key, token, operation_note);
-                list_of_users.add(user);
-            }
-            bufferedReader.close();
+            users.forEach( user -> parseUsers((JSONObject) user));
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    public void users_saving() throws IOException {
-        BufferedWriter bufferedWriter = Files.newBufferedWriter(path);
+    public void users_saving(){
+        JSONArray users = new JSONArray();
+        for(User user : list_of_users) {
+            JSONObject user_detail = new JSONObject();
 
-        try{
-            for(User user : list_of_users){
-                bufferedWriter.write(String.format("%s %s %s %s %s %s %s %s %s %s",
-                        user.getFirst_name(),
-                        user.getLast_name(),
-                        user.getPhone_number(),
-                        user.getBirth().format(dateTimeFormatter),
-                        user.getEmail(),
-                        user.getPrivilages(),
-                        Arrays.toString(user.getPublic_key()),
-                        Arrays.toString(user.getPrivate_key()),
-                        user.getToken(),
-                        user.getOperation_note()
-                ));
-                bufferedWriter.newLine();
-            }
-        } finally {
-            bufferedWriter.close();
+            user_detail.put("first_name", user.getFirst_name());
+            user_detail.put("last_name", user.getLast_name());
+            user_detail.put("phone_number", user.getPhone_number());
+            user_detail.put("birth", user.getBirth().format(dateTimeFormatter));
+            user_detail.put("email", user.getEmail());
+            user_detail.put("privilages", user.getPrivilages());
+            user_detail.put("public_key", Arrays.toString(user.getPublic_key()));
+            user_detail.put("private_key", Arrays.toString(user.getPrivate_key()));
+            user_detail.put("token", user.getToken());
+
+//            JSONObject user_json = new JSONObject();
+//            user_json.put(user.getPrivilages(), user_detail);
+            users.add(user_detail);
         }
+
+        try(FileWriter file = new FileWriter(String.valueOf(path))){
+            file.write(users.toJSONString());
+            file.flush();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void parseUsers(org.json.simple.JSONObject user){
+        String first_name = (String) user.get("first_name");
+        String last_name = (String) user.get("last_name");
+        String phone_number = (String) user.get("phone_number");
+        LocalDate localDate = LocalDate.parse((String) user.get("birth"), dateTimeFormatter);
+        String email = (String) user.get("email");
+        String privilages = (String) user.get("privilages");
+        byte[] public_key = ((String) user.get("public_key")).getBytes();
+        byte[] private_key = ((String) user.get("private_key")).getBytes();
+        String token = (String) user.get("token");
+
+        add_user(new User(first_name, last_name, phone_number, localDate, email, privilages, public_key, private_key, token));
     }
 
     /* Singleton - return only one instance of class*/
