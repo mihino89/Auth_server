@@ -11,6 +11,7 @@ import java.util.Date;
 
 public class UserSession {
     private Date time_of_loggin;
+    private final String algorithm = "RSA";
 
     private PublicKey pub;
     private PrivateKey pvt;
@@ -26,7 +27,7 @@ public class UserSession {
 
     private void generateTokens(){
         try{
-            KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA");
+            KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance(algorithm);
             keyPairGenerator.initialize(1024);
             KeyPair keyPair = keyPairGenerator.generateKeyPair();
 
@@ -50,7 +51,7 @@ public class UserSession {
         byte[] cipherText = new byte[0];
 
         try {
-            Cipher encryptCipher = Cipher.getInstance("RSA");
+            Cipher encryptCipher = Cipher.getInstance(algorithm);
             encryptCipher.init(Cipher.ENCRYPT_MODE, publicKey);
             cipherText = encryptCipher.doFinal(passwd.getBytes(StandardCharsets.UTF_8));
         } catch (NoSuchAlgorithmException | InvalidKeyException | NoSuchPaddingException | BadPaddingException | IllegalBlockSizeException e) {
@@ -64,7 +65,7 @@ public class UserSession {
         Cipher decriptCipher = null;
         byte[] bytes = Base64.getDecoder().decode(cipherText);
         try{
-            decriptCipher = Cipher.getInstance("RSA");
+            decriptCipher = Cipher.getInstance(algorithm);
             decriptCipher.init(Cipher.DECRYPT_MODE, privateKey);
         } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException e) {
             e.printStackTrace();
@@ -76,6 +77,10 @@ public class UserSession {
 
     public PublicKey getPublicKey() {
         return pub;
+    }
+
+    public PrivateKey getPrivateKey() {
+        return pvt;
     }
 
     public void test(){

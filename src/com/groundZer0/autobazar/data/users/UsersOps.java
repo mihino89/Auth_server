@@ -11,6 +11,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
 
 public class UsersOps {
 
@@ -37,9 +38,24 @@ public class UsersOps {
             while ((line_file_reader = bufferedReader.readLine()) != null) {
                 String[] user_information = line_file_reader.split(" ");
 
+                String name = user_information[0];
+                String last_name = user_information[1];
+                String phone_number = user_information[2];
                 String user_birth = user_information[3];
                 LocalDate localDate = LocalDate.parse(user_birth, dateTimeFormatter);
-                User user = new User(user_information[0], user_information[1], user_information[2], localDate, user_information[4], user_information[5], user_information[6], "loading");
+
+                /* Credentials */
+                String email = user_information[4];
+                String privilages = user_information[5];
+
+                /* Security */
+                byte[] public_key = user_information[6].getBytes();
+                byte[] private_key = user_information[7].getBytes();
+                String token = user_information[8];
+
+                /* Operationals */
+                String operation_note = user_information[9];
+                User user = new User(name, last_name, phone_number, localDate, email, privilages, public_key, private_key, token, operation_note);
                 list_of_users.add(user);
             }
             bufferedReader.close();
@@ -53,14 +69,16 @@ public class UsersOps {
 
         try{
             for(User user : list_of_users){
-                bufferedWriter.write(String.format("%s %s %s %s %s %s %s %s",
+                bufferedWriter.write(String.format("%s %s %s %s %s %s %s %s %s %s",
                         user.getFirst_name(),
                         user.getLast_name(),
                         user.getPhone_number(),
                         user.getBirth().format(dateTimeFormatter),
                         user.getEmail(),
-                        user.getPassword(),
                         user.getPrivilages(),
+                        Arrays.toString(user.getPublic_key()),
+                        Arrays.toString(user.getPrivate_key()),
+                        user.getToken(),
                         user.getOperation_note()
                 ));
                 bufferedWriter.newLine();
