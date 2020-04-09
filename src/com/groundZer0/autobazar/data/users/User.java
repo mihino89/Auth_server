@@ -1,4 +1,4 @@
-package com.groundZer0.autobazar.datamodel.users;
+package com.groundZer0.autobazar.data.users;
 
 
 import java.io.Serializable;
