@@ -3,16 +3,12 @@ package com.groundZer0.autobazar.networking;
 import com.groundZer0.autobazar.data.security.UserSecurity;
 import com.groundZer0.autobazar.data.users.User;
 import com.groundZer0.autobazar.data.users.UsersOps;
-import javafx.collections.ObservableList;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 import java.io.*;
 import java.net.Socket;
-import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
-import java.security.spec.InvalidKeySpecException;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
@@ -78,6 +74,13 @@ public class Thread extends java.lang.Thread {
                     }
                 }
             }
+            else if(Objects.equals(user.getOperation_note(), "delete_user")){
+                /* TODO check if request is from admin user */
+                System.out.println("admin want to delete user");
+                User deleted_user = user_delete(user);
+
+                objectOutputStream.writeObject(deleted_user);
+            }
 
             System.out.println("Closing no - sockets.");
             socket.close();
@@ -119,6 +122,20 @@ public class Thread extends java.lang.Thread {
         }
 
         System.out.println("nie je v zozname - login");
+        return null;
+    }
+
+    private User user_delete(User user){
+        list_of_users = UsersOps.getUsersOps().getUsers();
+        for(User list_user : list_of_users){
+           if(Objects.equals(user.getEmail(), list_user.getEmail()) && Objects.equals(user.getToken(), list_user.getToken())){
+               System.out.println("Nasiel som zhodu!!: " + user.getEmail());
+               UsersOps.getUsersOps().remove_user(list_user);
+
+               return new User("success");
+           }
+        }
+
         return null;
     }
 }

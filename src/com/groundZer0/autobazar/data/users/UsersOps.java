@@ -14,7 +14,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.Arrays;
 import java.util.Base64;
 
 
@@ -88,7 +87,6 @@ public class UsersOps {
         String email = (String) user.get("email");
         String privilages = (String) user.get("privilages");
         String pvt = (String) user.get("private_key");
-//        System.out.println(pvt);
         String pub = (String) user.get("private_key");
         byte[] public_key = Base64.getDecoder().decode(pub);
         byte[] private_key = Base64.getDecoder().decode(pvt);
@@ -115,7 +113,8 @@ public class UsersOps {
         list_of_users.add(new_user);
     }
 
-    public void remove_user(User new_user){
-        list_of_users.remove(new_user);
+    public void remove_user(User user_remove){
+        System.out.println("removing user");
+        list_of_users.remove(user_remove);
     }
 }
