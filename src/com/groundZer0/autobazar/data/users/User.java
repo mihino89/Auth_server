@@ -200,7 +200,6 @@ public class User implements Serializable {
     }
 
     public PrivateKey getPrivate_key_from_bytes(){
-        System.out.println("ds" + Arrays.toString(this.private_key));
         EncodedKeySpec privateKeySpec = new PKCS8EncodedKeySpec(getPrivate_key());
 
         try{

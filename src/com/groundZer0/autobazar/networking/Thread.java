@@ -3,6 +3,7 @@ package com.groundZer0.autobazar.networking;
 import com.groundZer0.autobazar.data.security.UserSecurity;
 import com.groundZer0.autobazar.data.users.User;
 import com.groundZer0.autobazar.data.users.UsersOps;
+import javafx.collections.ObservableList;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
@@ -42,6 +43,7 @@ public class Thread extends java.lang.Thread {
                 System.out.println("End of application session. saving users...!");
                 UsersOps.getUsersOps().users_saving();
                 socket.close();
+                return;
             }
             /* app user want registered */
             else if (Objects.equals(user.getOperation_note(), "registration")) {
@@ -55,11 +57,29 @@ public class Thread extends java.lang.Thread {
                 if(logged_user != null){
                     System.out.println("user logged " + logged_user.getFirst_name());
                 }
-
                 objectOutputStream.writeObject(logged_user);
+
+                /* Ak user bol admin, cakaj este na odpoved a posli mu vsetkych userov v db */
+                if(Objects.equals(logged_user.getPrivilages(), "admin")){
+                    System.out.println("Je to admin!");
+
+                    User admin_user = (User) objectInputStream.readObject();
+                    System.out.println(admin_user.getOperation_note());
+
+                    if(login(admin_user) != null){
+                        System.out.println("admin logged " + logged_user.getFirst_name());
+                        Object[] data = new Object[list_of_users.size()];
+                        int counter = 0;
+                        for(User list_user : list_of_users){
+                            data[counter] = list_user;
+                            counter++;
+                        }
+                        objectOutputStream.writeObject(data);
+                    }
+                }
             }
 
-            System.out.println("Closing sockets.");
+            System.out.println("Closing no - sockets.");
             socket.close();
         } catch (IOException | ClassNotFoundException | BadPaddingException | IllegalBlockSizeException e) {
             e.printStackTrace();
@@ -89,17 +109,13 @@ public class Thread extends java.lang.Thread {
         UserSecurity userSecurity = UserSecurity.getInstance();
 
         for(User db_user : list_of_users){
-            System.out.println("funguje " + Arrays.toString(db_user.getPrivate_key()));
             PrivateKey user_pvt_key = db_user.getPrivate_key_from_bytes();
-            System.out.println("funguje2 " + user_pvt_key);
             String db_user_passwd = userSecurity.decrypt(db_user.getToken(), user_pvt_key);
-            System.out.println("funguje3 " + db_user.getFirst_name());
             if (Objects.equals(db_user.getEmail(), user.getEmail()) && Objects.equals(db_user_passwd, user.getPassword())) {
                 System.out.println("found credential match");
                 db_user.setOperation_note("success");
                 return new User(db_user.getFirst_name(), db_user.getLast_name(), db_user.getPhone_number(), db_user.getBirth(), db_user.getEmail(), db_user.getPrivilages(), db_user.getPublic_key(), db_user.getToken(), "success");
             }
-            System.out.println("funguje4 " + db_user.getFirst_name());
         }
 
         System.out.println("nie je v zozname - login");
