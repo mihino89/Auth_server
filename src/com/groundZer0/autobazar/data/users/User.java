@@ -11,6 +11,7 @@ import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 import java.time.LocalDate;
+import java.util.Arrays;
 
 public class User implements Serializable {
     static final long serialVersionUID = 42L;
@@ -35,7 +36,7 @@ public class User implements Serializable {
     /* Operationals */
     private String operation_note;
 
-    /* Server complete constructor - without password, only with token and keys */
+    /* Server complete constructor - without password and operation note, only with token and keys */
     public User(String first_name, String last_name, String phone_number, LocalDate birth, String email, String privilages, byte[] public_key, byte[] private_key, String token) {
         this.first_name = first_name;
         this.last_name = last_name;
@@ -47,6 +48,19 @@ public class User implements Serializable {
         this.private_key = private_key;
         this.token = token;
 //        this.operation_note = operation_note;
+    }
+
+    /* Login response constructor */
+    public User(String first_name, String last_name, String phone_number, LocalDate birth, String email, String privilages, byte[] public_key, String token, String operation_note) {
+        this.first_name = first_name;
+        this.last_name = last_name;
+        this.phone_number = phone_number;
+        this.birth = birth;
+        this.email = email;
+        this.privilages = privilages;
+        this.public_key = public_key;
+        this.token = token;
+        this.operation_note = operation_note;
     }
 
     /* Registration constructor */
@@ -73,10 +87,9 @@ public class User implements Serializable {
     }
 
     /* Login constructor */
-    public User(String email, String password, String privilages, String operation_note) {
+    public User(String email, String password, String operation_note) {
         this.email = email;
         this.password = password;
-        this.privilages = privilages;
         this.operation_note = operation_note;
     }
 
@@ -186,16 +199,17 @@ public class User implements Serializable {
         return null;
     }
 
-    protected PrivateKey getPrivate_key_from_bytes(){
-        PrivateKey privateKey;
-        EncodedKeySpec privateKeySpec = new PKCS8EncodedKeySpec(this.private_key);
+    public PrivateKey getPrivate_key_from_bytes(){
+        System.out.println("ds" + Arrays.toString(this.private_key));
+        EncodedKeySpec privateKeySpec = new PKCS8EncodedKeySpec(getPrivate_key());
 
         try{
-            keyFactory = KeyFactory.getInstance(algorithm);
-            privateKey = keyFactory.generatePrivate(privateKeySpec);
+            KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+            PrivateKey pvt = keyFactory.generatePrivate(privateKeySpec);
 
-            return privateKey;
+            return pvt;
         } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
+            System.out.println("Proble s klucom( !");
             e.printStackTrace();
         }
 

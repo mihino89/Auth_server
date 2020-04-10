@@ -4,12 +4,14 @@ import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
 import java.nio.charset.StandardCharsets;
 import java.security.*;
 import java.util.Base64;
 import java.util.Date;
 
-public class UserSession {
+public class UserSecurity {
     private Date time_of_loggin;
     private final String algorithm = "RSA";
 
@@ -17,30 +19,37 @@ public class UserSession {
     private PrivateKey pvt;
 
     /* Singleton */
-    private static UserSession userSession;
+    private static UserSecurity userSecurity;
 
-    private UserSession(Date time_of_loggin) {
+    private UserSecurity(Date time_of_loggin) {
         this.time_of_loggin = time_of_loggin;
 
         generateTokens();
     }
 
+    private UserSecurity() {}
+
     private void generateTokens(){
         try{
             KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance(algorithm);
             keyPairGenerator.initialize(1024);
-            KeyPair keyPair = keyPairGenerator.generateKeyPair();
+            KeyPair keyPair = keyPairGenerator.genKeyPair();
 
             pub = keyPair.getPublic();
             pvt = keyPair.getPrivate();
+
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
         }
     }
 
-    public static UserSession getInstance(Date time_of_loggin){
-        userSession = new UserSession(time_of_loggin);
-        return userSession;
+    public static UserSecurity getInstance(Date time_of_loggin){
+        userSecurity = new UserSecurity(time_of_loggin);
+        return userSecurity;
+    }
+
+    public static UserSecurity getInstance(){
+        return userSecurity = new UserSecurity();
     }
 
     public Date getTime_of_loggin() {
@@ -81,17 +90,5 @@ public class UserSession {
 
     public PrivateKey getPrivateKey() {
         return pvt;
-    }
-
-    public void test(){
-        String test = "toto_je_test";
-        String token = encrypt(test, pub);
-
-        System.out.println(token);
-        try{
-            System.out.println(decrypt(token, pvt));
-        } catch (BadPaddingException | IllegalBlockSizeException e) {
-            e.printStackTrace();
-        }
     }
 }
