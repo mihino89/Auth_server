@@ -48,6 +48,13 @@ public class Thread extends java.lang.Thread {
                 objectOutputStream.writeObject(new User("success"));
             }
 
+            /* app user want registered */
+            else if (Objects.equals(user.getOperation_note(), "registration_admin")) {
+                User new_user = registration_new_user(user);
+                new_user.setOperation_note("success");
+                objectOutputStream.writeObject(new_user);
+            }
+
             /* Process of login */
             else if(Objects.equals(user.getOperation_note(), "login_credentials")){
                 User logged_user = login(user);
@@ -78,7 +85,6 @@ public class Thread extends java.lang.Thread {
 
             else if(Objects.equals(user.getOperation_note(), "delete_user")){
                 /* TODO check if request is from admin user */
-                System.out.println("admin want to delete user");
                 User deleted_user = user_delete(user);
 
                 objectOutputStream.writeObject(deleted_user);
@@ -117,25 +123,22 @@ public class Thread extends java.lang.Thread {
             PrivateKey user_pvt_key = db_user.getPrivate_key_from_bytes();
             String db_user_passwd = userSecurity.decrypt(db_user.getToken(), user_pvt_key);
             if (Objects.equals(db_user.getEmail(), user.getEmail()) && Objects.equals(db_user_passwd, user.getPassword())) {
-                System.out.println("found credential match");
                 db_user.setOperation_note("success");
                 return new User(db_user.getFirst_name(), db_user.getLast_name(), db_user.getPhone_number(), db_user.getBirth(), db_user.getEmail(), db_user.getPrivilages(), db_user.getPublic_key(), db_user.getToken(), "success");
             }
         }
 
-        System.out.println("nie je v zozname - login");
         return null;
     }
 
     private User user_delete(User user){
         list_of_users = UsersOps.getUsersOps().getUsers();
         for(User list_user : list_of_users){
-           if(Objects.equals(user.getEmail(), list_user.getEmail()) && Objects.equals(user.getToken(), list_user.getToken())){
-               System.out.println("Nasiel som zhodu!!: " + user.getEmail());
-               UsersOps.getUsersOps().remove_user(list_user);
+            if(Objects.equals(user.getEmail(), list_user.getEmail()) && Objects.equals(user.getToken(), list_user.getToken())){
+                UsersOps.getUsersOps().remove_user(list_user);
 
-               return new User("success");
-           }
+                return new User("success");
+            }
         }
 
         return null;
