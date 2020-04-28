@@ -41,24 +41,25 @@ public class Thread extends java.lang.Thread {
                 socket.close();
                 return;
             }
+
             /* app user want registered */
             else if (Objects.equals(user.getOperation_note(), "registration")) {
                 User new_user = registration_new_user(user);
-                System.out.println("user registered " + user.getFirst_name());
                 objectOutputStream.writeObject(new User("success"));
             }
+
             /* Process of login */
             else if(Objects.equals(user.getOperation_note(), "login_credentials")){
                 User logged_user = login(user);
-                if(logged_user != null){
-                    System.out.println("user logged " + logged_user.getFirst_name());
+                if(logged_user == null){
+                    objectOutputStream.writeObject(null);
+                    return;
                 }
+                System.out.println("user logged " + logged_user.getFirst_name());
                 objectOutputStream.writeObject(logged_user);
 
                 /* Ak user bol admin, cakaj este na odpoved a posli mu vsetkych userov v db */
                 if(Objects.equals(logged_user.getPrivilages(), "admin")){
-                    System.out.println("Je to admin!");
-
                     User admin_user = (User) objectInputStream.readObject();
                     System.out.println(admin_user.getOperation_note());
 
@@ -74,6 +75,7 @@ public class Thread extends java.lang.Thread {
                     }
                 }
             }
+
             else if(Objects.equals(user.getOperation_note(), "delete_user")){
                 /* TODO check if request is from admin user */
                 System.out.println("admin want to delete user");
