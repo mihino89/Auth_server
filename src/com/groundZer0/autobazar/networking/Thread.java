@@ -26,13 +26,15 @@ public class Thread extends java.lang.Thread {
     public void run() {
         System.out.println("Accept connection from " + this.socket);
         try {
+            User user = null;
             InputStream inputStream = socket.getInputStream();
             OutputStream outputStream = socket.getOutputStream();
 
             ObjectInputStream objectInputStream = new ObjectInputStream(inputStream);
             ObjectOutputStream objectOutputStream = new ObjectOutputStream(outputStream);
 
-            User user = (User) objectInputStream.readObject();
+            Object o = (Object) objectInputStream.readObject();
+            user = o instanceof User ? (User) o : null;
 
             /* application ending */
             if(user == null){
@@ -97,6 +99,11 @@ public class Thread extends java.lang.Thread {
         }
     }
 
+    /**
+     * helper function to registred new user
+     * @param user
+     * @return
+     */
     private User registration_new_user(User user){
         Date session_start_time;
         UserSecurity userSecurity;
@@ -115,6 +122,13 @@ public class Thread extends java.lang.Thread {
         return user;
     }
 
+    /**
+     * helper function in logged in
+     * @param user
+     * @return
+     * @throws BadPaddingException
+     * @throws IllegalBlockSizeException
+     */
     private User login(User user) throws BadPaddingException, IllegalBlockSizeException {
         list_of_users = UsersOps.getUsersOps().getUsers();
         UserSecurity userSecurity = UserSecurity.getInstance();
@@ -131,6 +145,11 @@ public class Thread extends java.lang.Thread {
         return null;
     }
 
+    /**
+     * helper function to delete user
+     * @param user
+     * @return
+     */
     private User user_delete(User user){
         list_of_users = UsersOps.getUsersOps().getUsers();
         for(User list_user : list_of_users){

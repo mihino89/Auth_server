@@ -21,6 +21,10 @@ public class UserSecurity {
     /* Singleton */
     private static UserSecurity userSecurity;
 
+    /**
+     * constructor which take actual time of log
+     * @param time_of_loggin
+     */
     private UserSecurity(Date time_of_loggin) {
         this.time_of_loggin = time_of_loggin;
 
@@ -29,6 +33,9 @@ public class UserSecurity {
 
     private UserSecurity() {}
 
+    /**
+     * generating keys function
+     */
     private void generateTokens(){
         try{
             KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance(algorithm);
@@ -56,6 +63,12 @@ public class UserSecurity {
         return time_of_loggin;
     }
 
+    /**
+     * for encrypting key
+     * @param passwd
+     * @param publicKey
+     * @return
+     */
     public String encrypt(String passwd, PublicKey publicKey){
         byte[] cipherText = new byte[0];
 
@@ -70,6 +83,14 @@ public class UserSecurity {
         return Base64.getEncoder().encodeToString(cipherText);
     }
 
+    /**
+     * for decrypting key
+     * @param cipherText
+     * @param privateKey
+     * @return
+     * @throws BadPaddingException
+     * @throws IllegalBlockSizeException
+     */
     public String decrypt(String cipherText, PrivateKey privateKey) throws BadPaddingException, IllegalBlockSizeException {
         Cipher decriptCipher = null;
         byte[] bytes = Base64.getDecoder().decode(cipherText);

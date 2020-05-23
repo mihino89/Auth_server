@@ -182,7 +182,10 @@ public class User implements Serializable {
         this.private_key = private_key;
     }
 
-    //https://examples.javacodegeeks.com/core-java/security/get-bytes-of-a-key-pair-example/
+    /**
+     * get public key from bytes helper function
+     * @return
+     */
     public PublicKey getPublic_key_from_bytes(){
         PublicKey publicKey;
         EncodedKeySpec publicKeySpec = new X509EncodedKeySpec(this.public_key);
@@ -199,6 +202,10 @@ public class User implements Serializable {
         return null;
     }
 
+    /**
+     * get private key from bytes
+     * @return
+     */
     public PrivateKey getPrivate_key_from_bytes(){
         EncodedKeySpec privateKeySpec = new PKCS8EncodedKeySpec(getPrivate_key());
 

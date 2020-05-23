@@ -33,6 +33,9 @@ public class UsersOps {
         dateTimeFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
     }
 
+    /**
+     * loading users from json
+     */
     public void users_loading() {
         list_of_users = FXCollections.observableArrayList();
         JSONParser jsonParser = new JSONParser();
@@ -52,6 +55,9 @@ public class UsersOps {
         }
     }
 
+    /**
+     * to save users
+     */
     public void users_saving(){
         JSONArray users = new JSONArray();
         System.out.println("users length: " + list_of_users.size());
@@ -79,6 +85,10 @@ public class UsersOps {
         }
     }
 
+    /**
+     * parsing users
+     * @param user
+     */
     private void parseUsers(org.json.simple.JSONObject user){
         String first_name = (String) user.get("first_name");
         String last_name = (String) user.get("last_name");
